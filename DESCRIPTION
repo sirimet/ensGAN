@@ -1,0 +1,23 @@
+Package: ensGAN
+Type: Package
+Title: Create a GAN with Ensemble Input
+Version: 0.1.0
+Author: Siri S. Eide
+Maintainer: The package maintainer <sirise@met.no>
+Description: More about what it does (maybe more than one line)
+    Use four spaces when indenting paragraphs within the Description.
+License: What license is it under?
+Encoding: UTF-8
+LazyData: true
+LinkingTo: Rcpp
+Depends: 
+    ggplot2,
+    jsonlite,
+    keras,
+    progress,
+    Rcpp,
+    rhdf5,
+    tensorflow,
+    tfdatasets,
+    tidyverse,
+    utf8
