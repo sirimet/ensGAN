@@ -3,6 +3,7 @@ Type: Package
 Title: Create a GAN with Ensemble Input
 Version: 0.1.0
 Author: Siri S. Eide
+biocViews: rhdf5
 Maintainer: The package maintainer <sirise@met.no>
 Description: More about what it does (maybe more than one line)
     Use four spaces when indenting paragraphs within the Description.
@@ -11,12 +12,10 @@ Encoding: UTF-8
 LazyData: true
 LinkingTo: Rcpp
 Depends: 
-    ggplot2,
     jsonlite,
     keras,
     progress,
     Rcpp,
-    rhdf5,
     tensorflow,
     tfdatasets,
     tidyverse,
