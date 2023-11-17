@@ -10,19 +10,34 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// rcpp_hello
-List rcpp_hello();
-RcppExport SEXP _ensGAN_rcpp_hello() {
+// crps_ensemble
+NumericVector crps_ensemble(NumericMatrix ens, NumericVector obs);
+RcppExport SEXP _ensGAN_crps_ensemble(SEXP ensSEXP, SEXP obsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    rcpp_result_gen = Rcpp::wrap(rcpp_hello());
+    Rcpp::traits::input_parameter< NumericMatrix >::type ens(ensSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type obs(obsSEXP);
+    rcpp_result_gen = Rcpp::wrap(crps_ensemble(ens, obs));
+    return rcpp_result_gen;
+END_RCPP
+}
+// crps_ensemble_fast
+NumericVector crps_ensemble_fast(NumericMatrix ens, NumericVector obs);
+RcppExport SEXP _ensGAN_crps_ensemble_fast(SEXP ensSEXP, SEXP obsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type ens(ensSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type obs(obsSEXP);
+    rcpp_result_gen = Rcpp::wrap(crps_ensemble_fast(ens, obs));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_ensGAN_rcpp_hello", (DL_FUNC) &_ensGAN_rcpp_hello, 0},
+    {"_ensGAN_crps_ensemble", (DL_FUNC) &_ensGAN_crps_ensemble, 2},
+    {"_ensGAN_crps_ensemble_fast", (DL_FUNC) &_ensGAN_crps_ensemble_fast, 2},
     {NULL, NULL, 0}
 };
 

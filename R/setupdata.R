@@ -4,7 +4,6 @@
 #' @param val_years
 #' @param batch_size
 #' @param val_size
-#' @param downsample
 #' @param weight
 #' @param val_fixed
 #' @param data_type
@@ -17,7 +16,7 @@ setup_batch_gen <- function(train_years,
                             val_years,
                             batch_size = 64,
                             val_size = NULL,
-                            downsample = FALSE,
+                            # downsample = FALSE,
                             weight = NULL,
                             val_fixed = TRUE,
                             data_type = data_type){
@@ -28,20 +27,21 @@ setup_batch_gen <- function(train_years,
     train <- NULL
   }else{
     train <- data_generator(train_years, batch_size = batch_size,
-                            downsample = downsample, weight = weight)
+                            # downsample = downsample,
+                            weight = weight)
   }
 
   # note -- using create_fixed_dataset with a batch size not divisible by 16 will cause problems [is this true?]
   # create_fixed_dataset will not take a list
   if(!is.null(val_size)){
     # assume that val_size is small enough that we can just use one batch
-    val = create_fixed_dataset(val_years, batch_size = val_size, downsample = downsample)
+    val = create_fixed_dataset(val_years, batch_size = val_size)# , downsample = downsample)
     val = val$take(1L)
     if(val_fixed){
       val = val$cache()
     }
   }else{
-    val <- create_fixed_dataset(val_years, batch_size = batch_size, downsample = downsample)
+    val <- create_fixed_dataset(val_years, batch_size = batch_size) #, downsample = downsample)
   }
   return(list(train, val))
 
@@ -54,7 +54,6 @@ setup_batch_gen <- function(train_years,
 #' @param train_years
 #' @param val_years
 #' @param val_size
-#' @param downsample
 #' @param weight
 #' @param batch_size
 #' @param load_full_image
@@ -78,15 +77,15 @@ setup_data <- function(train_years = NULL,
       batch_gen_train <- NULL
     }else{
       batch_gen_train <- setup_full_image_dataset(train_years,
-                                                  batch_size = batch_size,
-                                                  downsample = FALSE)
+                                                  batch_size = batch_size)
+                                                  # downsample = FALSE)
     }
     if(is.null(val_years)){
       batch_gen_valid <- NULL
     }else{
       batch_gen_valid <- setup_full_image_dataset(val_years,
-                                                  batch_size = batch_size,
-                                                  downsample = FALSE)
+                                                  batch_size = batch_size)
+                                                  # downsample = FALSE)
     }
   }else{
     c(batch_gen_train, batch_gen_valid) %<-% setup_batch_gen(

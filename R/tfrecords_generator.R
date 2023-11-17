@@ -3,15 +3,14 @@
 #' @param year
 #' @param batch_size
 #' @param repeated
-#' @param downsample
 #' @param weight
 #'
 #' @return
 #' @export
 #'
 #' @examples
-data_generator <- function(year, batch_size, repeated = TRUE, downsample = FALSE, weight = NULL){
-  return(create_mixed_dataset(year, batch_size, repeated = repeated, downsample = downsample, weight = weight))
+data_generator <- function(year, batch_size, repeated = TRUE, weight = NULL){
+  return(create_mixed_dataset(year, batch_size, repeated = repeated, weight = weight))
 }
 
 #' Title
@@ -22,7 +21,6 @@ data_generator <- function(year, batch_size, repeated = TRUE, downsample = FALSE
 #' @param con_shape
 #' @param out_shape
 #' @param repeated
-#' @param downsample
 #' @param folder
 #' @param shuffle_size
 #' @param weight
@@ -32,7 +30,7 @@ data_generator <- function(year, batch_size, repeated = TRUE, downsample = FALSE
 #'
 #' @examples
 create_mixed_dataset <- function(year, batch_size, era_shape = c(16,16,9), con_shape = c(128,128,3),
-                                 out_shape = c(128,128,1), repeated = TRUE, downsample = FALSE,
+                                 out_shape = c(128,128,1), repeated = TRUE,
                                  folder = records_folder, shuffle_size = 1024,
                                  weight=NULL){
   return_dic <- FALSE
@@ -49,12 +47,6 @@ create_mixed_dataset <- function(year, batch_size, era_shape = c(16,16,9), con_s
 
   sampled_ds = tf$data$Dataset$sample_from_datasets(datasets, weights = weight)$batch(batch_size)
 
-  if(downsample & return_dic){
-    sampled_ds = sampled_ds$map(dataset_downsampler)
-
-  }else if(downsample & !return_dic){
-    sampled_ds=sampled_ds$map(dataset_downsampler_list)
-  }
   sampled_ds = sampled_ds$prefetch(tf$cast(2, "int64"))
   return(sampled_ds)
 
@@ -79,26 +71,6 @@ dataset_downsampler <- function(inputs, outputs){
   return(list(inputs, outputs))
 }
 
-
-
-#' Title
-#'
-#' @param inputs
-#' @param constants
-#' @param outputs
-#'
-#' @return
-#' @export
-#'
-#' @examples
-dataset_downsampler_list <- function(inputs, constants, outputs){
-  ## Is this hardcoded?
-  image = outputs
-  kernel_tf = tf$constant(0.01, shape = c(8, 8, 1, 1), dtype = tf$float32)
-  image = tf$nn$conv2d(image, filters = kernel_tf, strides = c(1, 8, 8, 1), padding = 'VALID', name = 'conv_debug', data_format = 'NHWC')
-  inputs = image
-  return(list(inputs, constants, outputs))
-}
 
 #' Title
 #'
@@ -276,7 +248,6 @@ create_dataset <- function(year, clss, era_shape = c(16,16,11,9), con_shape = c(
 #' @param year
 #' @param mode
 #' @param batch_size
-#' @param downsample
 #' @param era_shape
 #' @param con_shape
 #' @param out_shape
@@ -288,7 +259,7 @@ create_dataset <- function(year, clss, era_shape = c(16,16,11,9), con_shape = c(
 #'
 #' @examples
 create_fixed_dataset <- function(year = NULL, mode = 'validation', batch_size = 16,
-                                downsample = FALSE, era_shape = c(16,16,9), con_shape = c(128,128,3),
+                                era_shape = c(16,16,9), con_shape = c(128,128,3),
                                 out_shape = c(128,128,1), name = NULL, folder = records_folder){
   batch_size = tf$cast(batch_size, "int64")
   return_dic <- FALSE
@@ -314,10 +285,6 @@ create_fixed_dataset <- function(year = NULL, mode = 'validation', batch_size = 
   }
   ds       <- ds$batch(batch_size)
 
-  if(downsample & return_dic){
-    ds     <- ds$map(dataset_downsampler)
-  }else if(downsample & !return_dic)
-    ds     <- ds$map(dataset_downsampler_list)
   return(ds)
 }
 

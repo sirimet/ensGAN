@@ -15,7 +15,7 @@
 #' @export
 #'
 #' @examples
-initialize_wgangp <- function(gen, disc, mode = mode,  arch = arch, gradient_penalty_weight = 10,
+initialize_ensgan <- function(gen, disc, mode = mode,  arch = arch, gradient_penalty_weight = 10,
                               lr_disc = 0.0001, lr_gen = 0.0001, avg_seed = NULL,
                               ensemble_size = NULL, ensemble_members = NULL, content_loss_weight = NULL){
   object <- NULL
@@ -28,7 +28,7 @@ initialize_wgangp <- function(gen, disc, mode = mode,  arch = arch, gradient_pen
   object$lr_gen = lr_gen
   object$ensemble_size = ensemble_size
   object$content_loss_weight = content_loss_weight
-  object <- object %>% build_wgan_gp()
+  object <- object %>% build_ens_gan()
 
   return(object)
 }
@@ -103,7 +103,7 @@ save <- function(self, save_fn_root){
 #' @export
 #'
 #' @examples
-build_wgan_gp <- function(self){
+build_ens_gan <- function(self){
   # find shapes for inputs
   cond_shapes  = input_shapes(self$gen, "lo_res_inputs")
   const_shapes = input_shapes(self$gen, "hi_res_inputs")

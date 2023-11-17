@@ -2,7 +2,7 @@
 using namespace Rcpp;
 #include <math.h>
 
-
+// Function provided by John Bjørnar Bremnes
 //  compute approximate crps for an ensemble
 // [[Rcpp::export]]
 NumericVector crps_ensemble_fast(NumericMatrix ens, NumericVector obs) {

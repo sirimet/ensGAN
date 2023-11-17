@@ -168,11 +168,14 @@ parse_single_instance_ens <- function(hi_res_input, const, lo_res_input){
 #' @export
 #'
 #' @examples
-write_images_to_tfr_short <- function(hi_res_inputs, consts, lo_res_inputs, filename = "images",
+write_images_to_tfr <- function(hi_res_inputs, consts, lo_res_inputs, filename = "images",
                                       records_folder = getwd()){
   ## Write files, no classes
 
-  filename <- paste0(records_folder, "/", filename, ".tfrecords")
+  if(!substr(records_folder, nchar(records_folder), nchar(records_folder)) == "/"){
+    records_folder <- paste0(records_folder, "/")
+  }
+  filename <- paste0(records_folder, filename, ".tfrecords")
   writer   <- tf$io$TFRecordWriter(filename) #create a writer that'll store our data to disk
   count    <- 0
 
@@ -206,12 +209,16 @@ write_images_to_tfr_short <- function(hi_res_inputs, consts, lo_res_inputs, file
 #' @export
 #'
 #' @examples
-write_images_to_tfr_short2 <- function(hi_res_inputs, consts, lo_res_inputs, filename = "images", num_class = 4,
+write_images_to_tfr_class <- function(hi_res_inputs, consts, lo_res_inputs, filename = "images", num_class = 4,
                                        records_folder = getwd()){
   # Write files with class divisions
+  if(!substr(records_folder, nchar(records_folder), nchar(records_folder)) == "/"){
+    records_folder <- paste0(records_folder, "/")
+  }
+
   fle_hdles <- list()
   for(fh in 1:num_class){
-    flename = paste0(records_folder, "/", filename, "_", fh, ".tfrecords")
+    flename = paste0(records_folder, filename, "_", fh, ".tfrecords")
     fle_hdles[[fh]] <- tf$io$TFRecordWriter(flename)
   }
 
@@ -251,11 +258,13 @@ write_images_to_tfr_short2 <- function(hi_res_inputs, consts, lo_res_inputs, fil
 #' @export
 #'
 #' @examples
-write_images_to_tfr_short_ens <- function(hi_res_inputs, consts, lo_res_inputs, filename = "images",
+write_images_to_tfr_ens <- function(hi_res_inputs, consts, lo_res_inputs, filename = "images",
                                           records_folder = getwd()){
   # Write ensemble data, no classes
-
-  filename <- paste0(records_folder, "/", filename, ".tfrecords")
+  if(!substr(records_folder, nchar(records_folder), nchar(records_folder)) == "/"){
+    records_folder <- paste0(records_folder, "/")
+  }
+  filename <- paste0(records_folder, filename, ".tfrecords")
   writer   <- tf$io$TFRecordWriter(filename) #create a writer that'll store our data to disk
   count    <- 0
 
@@ -291,13 +300,17 @@ write_images_to_tfr_short_ens <- function(hi_res_inputs, consts, lo_res_inputs, 
 #' @export
 #'
 #' @examples
-write_images_to_tfr_short_ens2 <- function(hi_res_inputs, consts, lo_res_inputs, filename = "images", num_class = 4,
+write_images_to_tfr_ens_class <- function(hi_res_inputs, consts, lo_res_inputs, filename = "images", num_class = 4,
                                            records_folder = getwd()){
 
   # Write ensemble data, classes
+  if(!substr(records_folder, nchar(records_folder), nchar(records_folder)) == "/"){
+    records_folder <- paste0(records_folder, "/")
+  }
+
   fle_hdles <- list()
   for(fh in 1:num_class){
-    flename = paste0(records_folder, "/", filename, "_", fh, ".tfrecords")
+    flename = paste0(records_folder, filename, "_", fh, ".tfrecords")
     fle_hdles[[fh]] <- tf$io$TFRecordWriter(flename)
   }
 
@@ -307,7 +320,7 @@ write_images_to_tfr_short_ens2 <- function(hi_res_inputs, consts, lo_res_inputs,
     #get the data we want to write
     current_hi_res_input = hi_res_inputs[index, , , , drop = FALSE]
     current_const = consts[index, , , , drop = FALSE]
-    current_lo_res_input = lo_res_inputs[index, , , , drop = FALSE]
+    current_lo_res_input = lo_res_inputs[index, , , , , drop = FALSE]
 
     out = parse_single_instance_ens(hi_res_input = current_hi_res_input, const = current_const, lo_res_input = current_lo_res_input)
 
@@ -500,15 +513,53 @@ parse_tfr_element_ens <- function(element){
 
 #' Title
 #'
-#' @param filename
+#' @param batch_size
+#' @param records_folder
+#' @param pattern
 #'
 #' @return
 #' @export
 #'
 #' @examples
-get_dataset_small <- function(filename){
+get_dataset <- function(records_folder, pattern, batch_size){
   #create the dataset
-  dataset <- tfdatasets::tfrecord_dataset(filename)
+  if(substr(records_folder, nchar(records_folder), nchar(records_folder)) == "/"){
+    records_folder <- substr(records_folder, 1, nchar(records_folder)-1)
+  }
+
+  fl       <- dir(path = records_folder, pattern = pattern, full.names = TRUE)
+  dataset <- tfdatasets::tfrecord_dataset(fl)
+
+  #pass every single feature through our mapping function
+  dataset <- dataset %>% tfdatasets::dataset_map(
+    parse_tfr_element
+  ) %>%
+    dataset_shuffle(5) %>%
+    dataset_batch(batch_size, drop_remainder = TRUE) %>%
+    dataset_prefetch(1)
+
+  return(dataset)
+
+}
+
+#' Title
+#'
+#' @param records_folder
+#' @param pattern
+#' @param batch_size
+#'
+#' @return
+#' @export
+#'
+#' @examples
+get_dataset_class <- function(records_folder, pattern, batch_size){
+  #create the dataset
+  if(substr(records_folder, nchar(records_folder), nchar(records_folder)) == "/"){
+    records_folder <- substr(records_folder, 1, nchar(records_folder)-1)
+  }
+
+  fl       <- dir(path = records_folder, pattern = pattern, full.names = TRUE)
+  dataset <- tfdatasets::tfrecord_dataset(fl)
 
   #pass every single feature through our mapping function
   dataset <- dataset %>% tfdatasets::dataset_map(
@@ -524,15 +575,53 @@ get_dataset_small <- function(filename){
 
 #' Title
 #'
-#' @param filename
+#' @param records_folder
+#' @param pattern
+#' @param batch_size
 #'
 #' @return
 #' @export
 #'
 #' @examples
-get_dataset_small_ens <- function(filename){
+get_dataset_ens_class <- function(records_folder, pattern, batch_size){
   #create the dataset
-  dataset <- tfdatasets::tfrecord_dataset(filename)
+  if(substr(records_folder, nchar(records_folder), nchar(records_folder)) == "/"){
+    records_folder <- substr(records_folder, 1, nchar(records_folder)-1)
+  }
+
+  fl       <- dir(path = records_folder, pattern = pattern, full.names = TRUE)
+  dataset <- tfdatasets::tfrecord_dataset(fl)
+
+  #pass every single feature through our mapping function
+  dataset <- dataset %>% tfdatasets::dataset_map(
+    parse_tfr_element_ens
+  ) %>%
+    dataset_shuffle(5) %>%
+    dataset_batch(batch_size, drop_remainder = TRUE) %>%
+    dataset_prefetch(1)
+
+  return(dataset)
+
+}
+
+#' Title
+#'
+#' @param batch_size
+#' @param records_folder
+#' @param pattern
+#'
+#' @return
+#' @export
+#'
+#' @examples
+get_dataset_ens <- function(records_folder, pattern, batch_size){
+  #create the dataset
+  if(substr(records_folder, nchar(records_folder), nchar(records_folder)) == "/"){
+    records_folder <- substr(records_folder, 1, nchar(records_folder)-1)
+  }
+
+  fl       <- dir(path = records_folder, pattern = pattern, full.names = TRUE)
+  dataset <- tfdatasets::tfrecord_dataset(fl)
 
   #pass every single feature through our mapping function
   dataset <- dataset %>% tfdatasets::dataset_map(
@@ -622,7 +711,7 @@ parse_batch <- function(record_batch, insize = c(512,512,1), consize = c(512,512
 #'
 #' @examples
 parse_batch_ens <- function(record_batch, insize = c(512,512,1), consize = c(512,512,2),
-                            outsize = c(64,64,9), return_dic = FALSE){
+                            outsize = c(64,64,11,9), return_dic = FALSE){
   # Create a description of the features
   feature_description = list(
     h1 = tf$io$FixedLenFeature(shape(), tf$int64),
