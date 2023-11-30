@@ -184,7 +184,7 @@ ensemble_ranks <- function(...,
     pooling_methods <- c(pooling_methods, 'avg_8_no_overlap')
   }
 
-  for(k in 1:floor(total_samples / batch_size)){ # 1:num_batches ? #83 for... I dunno... lead time 72? ## normally 90 / batch_size
+  for(k in 1:floor(total_samples / batch_size)){
     cat(k, "\n")
     # load truth images
     if(data_type == "mixed"){ ## changed from mod_type to data_type

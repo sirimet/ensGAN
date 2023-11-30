@@ -1,4 +1,4 @@
-## MODIFIED FROM THIS:
+## ADAPTED TO R FROM ORIGINAL PYTHON:
 # # BSD 3-Clause License
 #
 # # Copyright (c) 2019, PySteps developers
@@ -29,168 +29,16 @@
 # # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#' Title
+#' Compute radially averaged power spectral density (RAPSD) from the given 2D input field
 #'
-#' @param M
-#' @param N
-#'
-#' @return
-#' @export
-#'
-#' @examples
-compute_centred_coord_array <- function(M, N){
-  # """Compute a 2D coordinate array, where the origin is at the center.
-  #   Parameters
-  #   ----------
-  #   M : int
-  #     The height of the array.
-  #   N : int
-  #     The width of the array.
-  #   Returns
-  #   -------
-  #   out : ndarray
-  #     The coordinate array.
-  #   Examples
-  #   --------
-  #   >>> compute_centred_coord_array(2, 2)
-  #   (array([[-2],\n
-  #       [-1],\n
-  #       [ 0],\n
-  #       [ 1],\n
-  #       [ 2]]), array([[-2, -1,  0,  1,  2]]))
-  #   """
-
-  if(M %% 2 == 1){
-    # s1 = np.s_[-int(M / 2) : int(M / 2) + 1]
-    s1 <- c(-round(M / 2) : (round(M / 2)))
-  }else{
-    # s1 = np.s_[-int(M / 2) : int(M / 2)]
-    s1 <- c((1 - round(M / 2)) : round(M / 2))
-  }
-
-  if(N %% 2 == 1){
-    # s2 = np.s_[-int(N / 2) : int(N / 2) + 1]
-    s2 <- c(-round(N / 2) : (round(N / 2)))
-  }else{
-    # s2 = np.s_[-int(N / 2) : int(N / 2)]
-    s2 <- c((1 - round(N / 2)) : round(N / 2))
-  }
-
-  # YC, XC = np.ogrid[s1, s2]
-
-  YC <- matrix(s1, nrow = length(s1), ncol = 1)
-  XC <- matrix(s2, nrow = 1, ncol = length(s2))
-  return(list(YC, XC))
-}
-
-#' Title
-#'
-#' @param input_matrix
-#' @param dim
-#'
-#' @return
-#' @export
-#'
-#' @examples
-fftshift <- function(input_matrix, dim = -1) {
-
-  rows <- dim(input_matrix)[1]
-  cols <- dim(input_matrix)[2]
-
-  swap_up_down <- function(input_matrix) {
-    rows_half <- ceiling(rows/2)
-    return(rbind(input_matrix[((rows_half+1):rows), (1:cols)], input_matrix[(1:rows_half), (1:cols)]))
-  }
-
-  swap_left_right <- function(input_matrix) {
-    cols_half <- ceiling(cols/2)
-    return(cbind(input_matrix[1:rows, ((cols_half+1):cols)], input_matrix[1:rows, 1:cols_half]))
-  }
-
-  if (dim == -1) {
-    input_matrix <- swap_up_down(input_matrix)
-    return(swap_left_right(input_matrix))
-  }
-  else if (dim == 1) {
-    return(swap_up_down(input_matrix))
-  }
-  else if (dim == 2) {
-    return(swap_left_right(input_matrix))
-  }
-  else {
-    stop("Invalid dimension parameter")
-  }
-}
-
-#' Title
-#'
-#' @param input_matrix
-#' @param dim
-#'
-#' @return
-#' @export
-#'
-#' @examples
-ifftshift <- function(input_matrix, dim = -1) {
-
-  rows <- dim(input_matrix)[1]
-  cols <- dim(input_matrix)[2]
-
-  swap_up_down <- function(input_matrix) {
-    rows_half <- floor(rows/2)
-    return(rbind(input_matrix[((rows_half+1):rows), (1:cols)], input_matrix[(1:rows_half), (1:cols)]))
-  }
-
-  swap_left_right <- function(input_matrix) {
-    cols_half <- floor(cols/2)
-    return(cbind(input_matrix[1:rows, ((cols_half+1):cols)], input_matrix[1:rows, 1:cols_half]))
-  }
-
-  if (dim == -1) {
-    input_matrix <- swap_left_right(input_matrix)
-    return(swap_up_down(input_matrix))
-  }
-  else if (dim == 1) {
-    return(swap_up_down(input_matrix))
-  }
-  else if (dim == 2) {
-    return(swap_left_right(input_matrix))
-  }
-  else {
-    stop("Invalid dimension parameter")
-  }
-}
-
-#' Title
-#'
-#' @param n
-#' @param d
-#'
-#' @return
-#' @export
-#'
-#' @examples
-fftfreq <- function(n, d){
-  if(n %% 2 == 1){
-    # f = [0, 1, ..., (n-1)/2, -(n-1)/2, ..., -1] / (d*n)   if n is odd
-    f <- c(seq(0, (n-1)/2), seq(-(n-1)/2, -1)) / (d*n)
-  }else{
-    # f = [0, 1, ...,   n/2-1,     -n/2, ..., -1] / (d*n)   if n is even
-    f <- c(seq(0, (n/2-1)), seq(-n/2, -1)) / (d*n)
-  }
-  return(f)
-}
-
-#' Title
-#'
-#' @param field
-#' @param fft_method
-#' @param return_freq
-#' @param d
-#' @param normalize
+#' @param field A 2d array of shape (m, n) containing the input field.
+#' @param fft_method By default stats::fft
+#' @param return_freq Whether to also return the Fourier frequencies. By default FALSE.
+#' @param d Sample spacing (inverse of the sampling rate). Defaults to 1. Applicable if return_freq is TRUE.
+#' @param normalize If TRUE, normalize the power spectrum so that it sums to one.
 #' @param ...
 #'
-#' @return
+#' @return One-dimensional array containing the RAPSD. The length of the array is int(l/2) (if l is even) or int(l/2)+1 (if l is odd), where l=max(m,n). If return_freq, a one-dimensional array containing the Fourier frequencies is also returned.
 #' @export
 #'
 #' @examples
@@ -199,7 +47,6 @@ rapsd <- function(field,
                   return_freq = FALSE,
                   d = 1.0,
                   normalize = FALSE,
-                  # **fft_kwargs
                   ...){
   # """Compute radially averaged power spectral density (RAPSD) from the given
   #   2D input field.
@@ -283,7 +130,7 @@ rapsd <- function(field,
   }
 
   if(return_freq){
-    freq = fftfreq(l, d=d)
+    freq = fftfreq(l, d = d)
     freq = freq[r_range]
     return(list(result = result, freq = freq))
   }else{

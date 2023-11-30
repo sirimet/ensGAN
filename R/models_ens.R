@@ -48,7 +48,7 @@ generator_ens <- function(mode,
   reshaped_generator_input <- generator_input %>%
     layer_conv_3d(filters = input_channels, kernel_size=c(3, 3, 1), strides = 1, padding = "same") %>%
     layer_conv_3d(filters = input_channels, kernel_size=c(3, 3, 1), strides = 1, padding = "same") %>%
-    layer_max_pooling_3d(pool_size = c(1, 1, ensemble_members))
+    layer_average_pooling_3d(pool_size = c(1, 1, ensemble_members))
 
   reshaped_generator_input <- tf$squeeze(reshaped_generator_input, 3)
 
@@ -135,7 +135,7 @@ discriminator_ens <- function(arch,
   reshaped_generator_input <- generator_input %>%
     layer_conv_3d(filters = input_channels, kernel_size=c(3, 3, 1), strides = 1, padding = "same") %>%
     layer_conv_3d(filters = input_channels, kernel_size=c(3, 3, 1), strides = 1, padding = "same") %>%
-    layer_max_pooling_3d(pool_size = c(1, 1, ensemble_members)) ## dim out: c(NULL, NULL, 1, channels)
+    layer_average_pooling_3d(pool_size = c(1, 1, ensemble_members)) ## dim out: c(NULL, NULL, 1, channels)
 
   reshaped_generator_input <- tf$squeeze(reshaped_generator_input, 3) ## dim out: c(NULL, NULL, ensemble_members)
 
