@@ -34,10 +34,110 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// compute_centred_coord_array
+List compute_centred_coord_array(int M, int N);
+RcppExport SEXP _ensGAN_compute_centred_coord_array(SEXP MSEXP, SEXP NSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type M(MSEXP);
+    Rcpp::traits::input_parameter< int >::type N(NSEXP);
+    rcpp_result_gen = Rcpp::wrap(compute_centred_coord_array(M, N));
+    return rcpp_result_gen;
+END_RCPP
+}
+// fft_swap_up_down
+ComplexMatrix fft_swap_up_down(ComplexMatrix input_matrix);
+RcppExport SEXP _ensGAN_fft_swap_up_down(SEXP input_matrixSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< ComplexMatrix >::type input_matrix(input_matrixSEXP);
+    rcpp_result_gen = Rcpp::wrap(fft_swap_up_down(input_matrix));
+    return rcpp_result_gen;
+END_RCPP
+}
+// fft_swap_left_right
+ComplexMatrix fft_swap_left_right(ComplexMatrix input_matrix);
+RcppExport SEXP _ensGAN_fft_swap_left_right(SEXP input_matrixSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< ComplexMatrix >::type input_matrix(input_matrixSEXP);
+    rcpp_result_gen = Rcpp::wrap(fft_swap_left_right(input_matrix));
+    return rcpp_result_gen;
+END_RCPP
+}
+// fftshift
+ComplexMatrix fftshift(ComplexMatrix input_matrix, int dim);
+RcppExport SEXP _ensGAN_fftshift(SEXP input_matrixSEXP, SEXP dimSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< ComplexMatrix >::type input_matrix(input_matrixSEXP);
+    Rcpp::traits::input_parameter< int >::type dim(dimSEXP);
+    rcpp_result_gen = Rcpp::wrap(fftshift(input_matrix, dim));
+    return rcpp_result_gen;
+END_RCPP
+}
+// ifft_swap_up_down
+ComplexMatrix ifft_swap_up_down(ComplexMatrix input_matrix);
+RcppExport SEXP _ensGAN_ifft_swap_up_down(SEXP input_matrixSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< ComplexMatrix >::type input_matrix(input_matrixSEXP);
+    rcpp_result_gen = Rcpp::wrap(ifft_swap_up_down(input_matrix));
+    return rcpp_result_gen;
+END_RCPP
+}
+// ifft_swap_left_right
+ComplexMatrix ifft_swap_left_right(ComplexMatrix input_matrix);
+RcppExport SEXP _ensGAN_ifft_swap_left_right(SEXP input_matrixSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< ComplexMatrix >::type input_matrix(input_matrixSEXP);
+    rcpp_result_gen = Rcpp::wrap(ifft_swap_left_right(input_matrix));
+    return rcpp_result_gen;
+END_RCPP
+}
+// ifftshift
+ComplexMatrix ifftshift(ComplexMatrix input_matrix, int dim);
+RcppExport SEXP _ensGAN_ifftshift(SEXP input_matrixSEXP, SEXP dimSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< ComplexMatrix >::type input_matrix(input_matrixSEXP);
+    Rcpp::traits::input_parameter< int >::type dim(dimSEXP);
+    rcpp_result_gen = Rcpp::wrap(ifftshift(input_matrix, dim));
+    return rcpp_result_gen;
+END_RCPP
+}
+// fftfreq
+NumericVector fftfreq(int n, double d);
+RcppExport SEXP _ensGAN_fftfreq(SEXP nSEXP, SEXP dSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type n(nSEXP);
+    Rcpp::traits::input_parameter< double >::type d(dSEXP);
+    rcpp_result_gen = Rcpp::wrap(fftfreq(n, d));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_ensGAN_crps_ensemble", (DL_FUNC) &_ensGAN_crps_ensemble, 2},
     {"_ensGAN_crps_ensemble_fast", (DL_FUNC) &_ensGAN_crps_ensemble_fast, 2},
+    {"_ensGAN_compute_centred_coord_array", (DL_FUNC) &_ensGAN_compute_centred_coord_array, 2},
+    {"_ensGAN_fft_swap_up_down", (DL_FUNC) &_ensGAN_fft_swap_up_down, 1},
+    {"_ensGAN_fft_swap_left_right", (DL_FUNC) &_ensGAN_fft_swap_left_right, 1},
+    {"_ensGAN_fftshift", (DL_FUNC) &_ensGAN_fftshift, 2},
+    {"_ensGAN_ifft_swap_up_down", (DL_FUNC) &_ensGAN_ifft_swap_up_down, 1},
+    {"_ensGAN_ifft_swap_left_right", (DL_FUNC) &_ensGAN_ifft_swap_left_right, 1},
+    {"_ensGAN_ifftshift", (DL_FUNC) &_ensGAN_ifftshift, 2},
+    {"_ensGAN_fftfreq", (DL_FUNC) &_ensGAN_fftfreq, 2},
     {NULL, NULL, 0}
 };
 
