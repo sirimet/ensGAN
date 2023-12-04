@@ -137,10 +137,7 @@ build_ens_gan <- function(self){
       preds[[ii]] <- self$gen(list(gen_in[[1]], gen_in[[2]], gen_in[[2+ii]]))
     }
     preds <- tf$stack(preds)
-    ## not gonna lie, I'm not super confident in the next two lines:
-    pred_mean <- tf$cast(preds, "float32")
-    pred_mean <- tf$reduce_mean(preds, axis=0L)
-    full_gen_out <- c(full_gen_out, pred_mean)
+    full_gen_out <- c(full_gen_out, preds)
 
   }
   self$gen_trainer <- keras_model(inputs=gen_in,
