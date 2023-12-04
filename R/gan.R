@@ -138,7 +138,7 @@ build_ens_gan <- function(self){
     }
     preds <- tf$stack(preds)
     ## not gonna lie, I'm not super confident in the next two lines:
-    pred_mean <- tf$cast(preds, "int32")
+    pred_mean <- tf$cast(preds, "float32")
     pred_mean <- tf$reduce_mean(preds, axis=0L)
     full_gen_out <- c(full_gen_out, pred_mean)
 
