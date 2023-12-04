@@ -207,8 +207,13 @@ compile <- function(self, opt_disc = NULL, opt_gen = NULL){
 
   self$disc$trainable <- TRUE
   self$gen$trainable <- FALSE
+  if(!is.null(self$ensemble_size)){
+    losses_d <- list(wasserstein_loss, wasserstein_loss)
+  }else{
+    losses_d <- list(custom_loss, custom_loss)
+  }
   self$disc_trainer$compile(
-    loss = list(custom_loss, custom_loss),
+    loss = losses_d,
     loss_weights = list(1.0, 1.0),
     optimizer = self$opt_disc
   )
@@ -284,7 +289,7 @@ train <- function(self, batch_gen, noise_gen, num_gen_batches = 1,
         cond <- cond[ , , , 1:ensemble_members, , drop = FALSE]
       }
 
-      cat("About to train step 1\n")
+      #cat("About to train step 1\n")
 
       self$gen$trainable <- FALSE
       dl <- self$disc_trainer$train_on_batch(
@@ -340,7 +345,7 @@ train <- function(self, batch_gen, noise_gen, num_gen_batches = 1,
     }
     gt_inputs <- c(condconst, noise_list)
 
-    cat("About to train step 2\n")
+    #cat("About to train step 2\n")
 
     if(self$mode == 'GAN'){
       gen_loss = self$gen_trainer$train_on_batch(
