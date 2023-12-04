@@ -208,7 +208,8 @@ compile <- function(self, opt_disc = NULL, opt_gen = NULL){
   self$disc$trainable <- TRUE
   self$gen$trainable <- FALSE
   self$disc_trainer$compile(
-    loss = list(custom_loss, custom_loss),
+    #loss = list(custom_loss, custom_loss),
+    loss = list(wasserstein_loss, wasserstein_loss)
     loss_weights = list(1.0, 1.0),
     optimizer = self$opt_disc
   )
