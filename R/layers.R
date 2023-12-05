@@ -16,7 +16,7 @@ random_weighted_average <- function(x, y){
   for(i in 1:(length(k_int_shape(x))-1)){
     weights = k_expand_dims(weights,-1)
   }
-  weights <- tf$cast(weights, "float16")
+  weights <- tf$cast(weights, "float32")
   return(x*weights + y*(1-weights))
 }
 
