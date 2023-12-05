@@ -137,6 +137,7 @@ build_ens_gan <- function(self){
       preds[[ii]] <- self$gen(list(gen_in[[1]], gen_in[[2]], gen_in[[2+ii]]))
     }
     preds <- tf$stack(preds)
+    pred_mean <- tf$reduce_mean(preds, axis=0)
     full_gen_out <- c(full_gen_out, preds)
 
   }
