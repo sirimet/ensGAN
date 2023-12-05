@@ -138,7 +138,7 @@ build_ens_gan <- function(self){
     }
     preds <- tf$stack(preds)
     pred_mean <- tf$reduce_mean(preds, axis=0L)
-    full_gen_out <- c(full_gen_out, preds_mean)
+    full_gen_out <- c(full_gen_out, pred_mean)
 
   }
   self$gen_trainer <- keras_model(inputs=gen_in,
