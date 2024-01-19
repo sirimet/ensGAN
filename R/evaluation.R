@@ -92,7 +92,7 @@ setup_inputs <- function(...,
 }
 
 
-#' Title
+#' Randomize NaNs
 #'
 #' @param x
 #' @param rnd_mean
@@ -109,7 +109,7 @@ randomize_nans <- function(x, rnd_mean, rnd_range){
   # return(x) # ???
 }
 
-#' Title
+#' Ensemble Ranks
 #'
 #' @param ...
 #' @param mode
@@ -446,7 +446,7 @@ ensemble_ranks <- function(...,
 
 
 
-#' Title
+#' Rank KS
 #'
 #' @param norm_ranks
 #' @param num_ranks
@@ -457,26 +457,20 @@ ensemble_ranks <- function(...,
 #' @examples
 rank_KS <- function(norm_ranks, num_ranks = 100){
 
-  ## python's zero indexing might or might not be a problem here. will need to come back and check.
-
-  # (h, b) = np.histogram(norm_ranks, num_ranks+1)
   tmp <- hist(norm_ranks, breaks = seq(min(norm_ranks), max(norm_ranks), length.out = num_ranks + 2), right = FALSE, plot = FALSE)
   h   <- tmp$counts
   b   <- tmp$breaks
 
-  # h = h / h.sum()
   h   <- h / sum(h)
 
-  # ch = np.cumsum(h)
   ch  <- cumsum(h)
 
-  # cb = b[1:]
   cb  <- b[-1]
   return(max(abs(ch-cb)))
 }
 
 
-#' Title
+#' Rank CvM
 #'
 #' @param norm_ranks
 #' @param num_ranks
@@ -486,7 +480,6 @@ rank_KS <- function(norm_ranks, num_ranks = 100){
 #'
 #' @examples
 rank_CvM <- function(norm_ranks, num_ranks = 100){
-  # (h, b) = np.histogram(norm_ranks, num_ranks+1)
   tmp <- hist(norm_ranks, breaks = seq(min(norm_ranks), max(norm_ranks), length.out = num_ranks+2), right = FALSE, plot = FALSE)
   h   <- tmp$counts
   b   <- tmp$breaks
@@ -500,7 +493,7 @@ rank_CvM <- function(norm_ranks, num_ranks = 100){
 }
 
 
-#' Title
+#' Rank DKL
 #'
 #' @param norm_ranks
 #' @param num_ranks
@@ -521,7 +514,7 @@ rank_DKL <- function(norm_ranks, num_ranks = 100){
 }
 
 
-#' Title
+#' Rank OP
 #'
 #' @param norm_ranks
 #' @param num_ranks
@@ -537,7 +530,7 @@ rank_OP <- function(norm_ranks, num_ranks = 100){
 }
 
 
-#' Title
+#' Log line
 #'
 #' @param log_fname
 #' @param line
@@ -559,7 +552,7 @@ log_line <- function(log_fname, line){
 }
 
 
-#' Title
+#' Rank Metrics by Time
 #'
 #' @param ...
 #' @param mode
@@ -715,19 +708,14 @@ rank_metrics_by_time <- function(...,
       # This is super python specific, so I guess I will make it equally R specific
       if(model_number %in% ranks_to_save){
         if(!add_noise & !load_full_image){
-          # fname = 'ranks-small_image-{}.npz'.format(model_number)
           fname = paste0(mod, "_ranks-small_image-", model_number, ".RData")
         }else if(add_noise & !load_full_image){
-          # fname = 'ranks-small_image-noise-{}.npz'.format(model_number)
           fname = paste0(mod, "_ranks-small_image-noise-", model_number, ".RData")
         } else if(!add_noise & load_full_image){
-          # fname = 'ranks-full_image-{}.npz'.format(model_number)
           fname = paste0(mod, "_ranks-full_image-", model_number, ".RData")
         } else if(add_noise & load_full_image){
-          # fname = 'ranks-full_image-noise-{}.npz'.format(model_number)
           fname = paste0(mod, "_ranks-full_image-noise-", model_number, ".RData")
         }
-        # np.savez(os.path.join(ranks_folder, fname), ranks)
         base::save(ranks, file = paste(ranks_folder, fname, sep = "/"))
       }
     }
@@ -735,7 +723,7 @@ rank_metrics_by_time <- function(...,
 }
 
 
-#' Title
+#' Log Spectral Distance
 #'
 #' @param img1
 #' @param img2
@@ -761,7 +749,7 @@ log_spectral_distance <- function(img1, img2){
 }
 
 
-#' Title
+#' Log Spectral Distance Batch
 #'
 #' @param batch1
 #' @param batch2
@@ -779,10 +767,10 @@ log_spectral_distance_batch <- function(batch1, batch2){
     lsd_batch <- c(lsd_batch, lsd)
   }
 
-  return(lsd_batch) # original code had return np.array(lsd_batch) so perhaps list is not right? We'll see
+  return(lsd_batch)
 }
 
-#' Title
+#' Calculate RAPSD RMSE
 #'
 #' @param truth
 #' @param pred
@@ -798,7 +786,6 @@ calculate_rapsd_rmse <- function(truth, pred){
     return(NaN)
   }
 
-  ### HEYYYYY an entire new script to translate. Magnificent! Will get back to that then.
   fft_freq_truth = rapsd(truth, fft_method = fft)
   fft_freq_pred  = rapsd(pred,  fft_method = fft)
   truth <- 10 * log10(fft_freq_truth)
@@ -807,7 +794,7 @@ calculate_rapsd_rmse <- function(truth, pred){
   return(rmse)
 }
 
-#' Title
+#' RAPSD batch
 #'
 #' @param batch1
 #' @param batch2
@@ -836,7 +823,7 @@ rapsd_batch <- function(batch1, batch2){
   return(rapsd_batch) # again, possibly not a list? np.array(rapsd_batch)
 }
 
-#' Title
+#' Image Quality
 #'
 #' @param ...
 #' @param mode
@@ -923,7 +910,7 @@ image_quality <- function(...,
     }
 
     noise_shape <- c(dim(as.array(cond[1, , , 1])), noise_channels)
-    noise_gen   <- noise_generator(noise_shape, batch_size = batch_size) # * num_batches) # going a bit off script here, by replacing batch_size with batch_size * num_batches.
+    noise_gen   <- noise_generator(noise_shape, batch_size = batch_size)
 
     for(em in 1:11){
       cond <- ens[ , , , , em]
@@ -938,7 +925,6 @@ image_quality <- function(...,
         mae   <- apply((abs(sample - img_gen)), 1, mean)
         mse   <- apply((sample - img_gen)**2, 1, mean)
 
-        ### gaaaaaahh, another script. I was kidding before. It's actually quite miserable to discover one of these
         ssim  <- MultiScaleSSIM(sample, img_gen, 1.0)
         lsd   <- log_spectral_distance_batch(sample, img_gen)
         rapsd1 <- rapsd_batch(sample, img_gen)
@@ -962,7 +948,7 @@ image_quality <- function(...,
 
 
 
-#' Title
+#' Quality Metrics by Time
 #'
 #' @param ...
 #' @param mode

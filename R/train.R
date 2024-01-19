@@ -39,7 +39,7 @@ train_model <- function(...,
   noise_shape = c(img_shape[1], img_shape[2], noise_channels)
   noise_gen   = noise_generator(noise_shape, batch_size = batch_size)
   loss_log    = train(model, batch_gen_train, noise_gen,
-                      steps_per_checkpoint, training_ratio = 1) #5)
+                      steps_per_checkpoint, training_ratio = 5)
 
   return(loss_log)
 }

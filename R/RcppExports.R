@@ -9,3 +9,35 @@ crps_ensemble_fast <- function(ens, obs) {
     .Call(`_ensGAN_crps_ensemble_fast`, ens, obs)
 }
 
+compute_centred_coord_array <- function(M, N) {
+    .Call(`_ensGAN_compute_centred_coord_array`, M, N)
+}
+
+fft_swap_up_down <- function(input_matrix) {
+    .Call(`_ensGAN_fft_swap_up_down`, input_matrix)
+}
+
+fft_swap_left_right <- function(input_matrix) {
+    .Call(`_ensGAN_fft_swap_left_right`, input_matrix)
+}
+
+fftshift <- function(input_matrix, dim = -1L) {
+    .Call(`_ensGAN_fftshift`, input_matrix, dim)
+}
+
+ifft_swap_up_down <- function(input_matrix) {
+    .Call(`_ensGAN_ifft_swap_up_down`, input_matrix)
+}
+
+ifft_swap_left_right <- function(input_matrix) {
+    .Call(`_ensGAN_ifft_swap_left_right`, input_matrix)
+}
+
+ifftshift <- function(input_matrix, dim = -1L) {
+    .Call(`_ensGAN_ifftshift`, input_matrix, dim)
+}
+
+fftfreq <- function(n, d = 1.0) {
+    .Call(`_ensGAN_fftfreq`, n, d)
+}
+

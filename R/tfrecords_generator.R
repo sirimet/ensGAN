@@ -9,8 +9,8 @@
 #' @export
 #'
 #' @examples
-data_generator <- function(year, batch_size, repeated = TRUE, weight = NULL){
-  return(create_mixed_dataset(year, batch_size, repeated = repeated, weight = weight))
+data_generator <- function(year, batch_size, repeated = TRUE, weight = NULL, records_folder = records_folder){
+  return(create_mixed_dataset(year, batch_size, repeated = repeated, weight = weight, records_folder = records_folder))
 }
 
 #' Title
@@ -31,7 +31,7 @@ data_generator <- function(year, batch_size, repeated = TRUE, weight = NULL){
 #' @examples
 create_mixed_dataset <- function(year, batch_size, era_shape = c(16,16,9), con_shape = c(128,128,3),
                                  out_shape = c(128,128,1), repeated = TRUE,
-                                 folder = records_folder, shuffle_size = 1024,
+                                 records_folder = records_folder, shuffle_size = 1024,
                                  weight=NULL){
   return_dic <- FALSE
   batch_size <- as.integer(batch_size)
@@ -42,7 +42,7 @@ create_mixed_dataset <- function(year, batch_size, era_shape = c(16,16,9), con_s
     weight <- as.list(rep(1/classes, classes))
   }
 
-  datasets <- lapply(1:classes, function(i) create_dataset(year, i, folder = folder, shuffle_size = shuffle_size,
+  datasets <- lapply(1:classes, function(i) create_dataset(year, i, records_folder = records_folder, shuffle_size = shuffle_size,
                                                            repeated = repeated))
 
   sampled_ds = tf$data$Dataset$sample_from_datasets(datasets, weights = weight)$batch(batch_size)
@@ -219,11 +219,11 @@ parse_batch_ens <- function(record_batch, insize = c(512,512,1), consize = c(512
 #'
 #' @examples
 create_dataset <- function(year, clss, era_shape = c(16,16,11,9), con_shape = c(128,128,3), out_shape = c(128,128,1),
-                           folder = records_folder, shuffle_size = 1024, repeated = TRUE){
+                           records_folder = records_folder, shuffle_size = 1024, repeated = TRUE){
   shuffle_size <- tf$cast(shuffle_size, "int64")
   AUTOTUNE  <- tf$data$experimental$AUTOTUNE
   # I did it - myyyyy way.
-  fl       <- unlist(lapply(year, function(x) dir(path = folder, pattern = paste0(x, "_", clss, ".tfrecords"), full.names = TRUE)))
+  fl       <- unlist(lapply(year, function(x) dir(path = records_folder, pattern = paste0(x, "_", clss, ".tfrecords"), full.names = TRUE)))
   files_ds <- tf$data$Dataset$list_files(fl)
   ds       <- tf$data$TFRecordDataset(files_ds,
                                       num_parallel_reads = AUTOTUNE)
@@ -260,7 +260,7 @@ create_dataset <- function(year, clss, era_shape = c(16,16,11,9), con_shape = c(
 #' @examples
 create_fixed_dataset <- function(year = NULL, mode = 'validation', batch_size = 16,
                                 era_shape = c(16,16,9), con_shape = c(128,128,3),
-                                out_shape = c(128,128,1), name = NULL, folder = records_folder){
+                                out_shape = c(128,128,1), name = NULL, records_folder = records_folder){
   batch_size = tf$cast(batch_size, "int64")
   return_dic <- FALSE
 
@@ -272,10 +272,10 @@ create_fixed_dataset <- function(year = NULL, mode = 'validation', batch_size = 
     }
   }
 
-  fl        <- unlist(lapply(name, function(x) dir(path = folder, pattern = x, full.names = TRUE)))
+  fl        <- unlist(lapply(name, function(x) dir(path = records_folder, pattern = x, full.names = TRUE)))
   files_ds <- tf$data$Dataset$list_files(fl)
   ds       <- tf$data$TFRecordDataset(files_ds,
-                                      num_parallel_reads = as.integer(1)) #tf$cast(1, "int64"))
+                                      num_parallel_reads = as.integer(1))
   if(!data_type == "mixed"){
     ds       <- ds$map(function(x) parse_batch_ens(x, insize = era_shape, consize = con_shape,
                                                    outsize = out_shape))

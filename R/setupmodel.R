@@ -1,4 +1,4 @@
-#' Title
+#' Setup an initial model
 #'
 #' @param ...
 #' @param mode
@@ -9,7 +9,6 @@
 #' @param noise_channels
 #' @param latent_variables
 #' @param padding
-#' @param kl_weight
 #' @param ensemble_size
 #' @param ensemble_members
 #' @param content_loss_weight
@@ -30,7 +29,7 @@ setup_model <- function(...,
                         noise_channels = NULL,
                         latent_variables = NULL,
                         padding = NULL,
-                        kl_weight = NULL,
+                        #kl_weight = NULL,
                         ensemble_size = NULL,
                         ensemble_members = NULL,
                         content_loss_weight = NULL,
