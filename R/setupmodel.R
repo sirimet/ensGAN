@@ -34,7 +34,8 @@ setup_model <- function(...,
                         ensemble_members = NULL,
                         content_loss_weight = NULL,
                         lr_disc = NULL,
-                        lr_gen = NULL){
+                        lr_gen = NULL,
+                        loss = loss){
 
   gen_to_use = list(ctrl  = generator,
                     mixed = generator,
@@ -58,7 +59,7 @@ setup_model <- function(...,
                      ensemble_members = ensemble_members,
                      padding        = padding)
   model = initialize_ensgan(gen, disc, mode, arch, lr_disc = lr_disc, lr_gen = lr_gen,
-                            ensemble_size = ensemble_size,
+                            ensemble_size = ensemble_size, loss = loss,
                             content_loss_weight = content_loss_weight)
 
   gc()

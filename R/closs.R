@@ -18,6 +18,7 @@ custom_loss <- function(y_true, y_pred, threshold = 2.087243){
   abs_err <- tf$abs(err)
   double_err <- tf$add(err, abs_err)
   penalty <- tf$divide(double_err, 2)
+  penalty <- k_mean(penalty, axis = -1)
 
   # calculate the final loss as the sum of the normal loss and penalty
   loss <- normal_loss + penalty

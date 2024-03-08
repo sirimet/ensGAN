@@ -16,7 +16,7 @@
 #'
 #' @examples
 initialize_ensgan <- function(gen, disc, mode = mode,  arch = arch, gradient_penalty_weight = 10,
-                              lr_disc = 0.0001, lr_gen = 0.0001, avg_seed = NULL,
+                              lr_disc = 0.0001, lr_gen = 0.0001, avg_seed = NULL, loss = loss,
                               ensemble_size = NULL, ensemble_members = NULL, content_loss_weight = NULL){
   object <- NULL
   object$gen = gen
@@ -26,6 +26,7 @@ initialize_ensgan <- function(gen, disc, mode = mode,  arch = arch, gradient_pen
   object$gradient_penalty_weight = gradient_penalty_weight
   object$lr_disc = lr_disc
   object$lr_gen = lr_gen
+  object$loss = loss
   object$ensemble_size = ensemble_size
   object$content_loss_weight = content_loss_weight
   object <- object %>% build_ens_gan()
@@ -191,12 +192,17 @@ compile <- function(self, opt_disc = NULL, opt_gen = NULL){
   }
   self$opt_gen = opt_gen
 
+  loss_to_use <- list(wasserstein = wasserstein_loss,
+                      custom = custom_loss)[[self$loss]]
+
   self$disc$trainable <- FALSE
   if(!is.null(self$ensemble_size)){
-    losses <- list(wasserstein_loss, 'mse')
+    losses <- list(loss_to_use, 'mse')
+#    losses <- list(custom_loss, "mse")
     loss_weights <- list(1.0, self$content_loss_weight)
   }else{
-    losses <- list(custom_loss)
+    losses <- list(loss_to_use)
+    # losses <- list(custom_loss)
     loss_weights <- list(1.0)
   }
   self$gen_trainer$compile(loss = losses,
@@ -206,9 +212,11 @@ compile <- function(self, opt_disc = NULL, opt_gen = NULL){
   self$disc$trainable <- TRUE
   self$gen$trainable <- FALSE
   if(!is.null(self$ensemble_size)){
-    losses_d <- list(wasserstein_loss, wasserstein_loss)
+    losses_d <- list(loss_to_use, loss_to_use)
+    # losses_d <- list(custom_loss, custom_loss)
   }else{
-    losses_d <- list(custom_loss, custom_loss)
+    losses_d <- list(loss_to_use, loss_to_use)
+    # losses_d <- list(custom_loss, custom_loss)
   }
   self$disc_trainer$compile(
     loss = losses_d,
